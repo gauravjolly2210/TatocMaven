@@ -9,37 +9,40 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import junit.framework.TestCase;
 
 public class demoTest {
 	
-	WebDriver driver=new ChromeDriver();
+	WebDriver driver;
 	public demoTest() {
 		System.setProperty("webdriver.chrome.driver","/home/qainfotech/Downloads/chromedriver");
+		driver=new ChromeDriver();
 	}
+
 	@Test
 	public void test() throws InterruptedException{
 		driver.get("http://10.0.1.86/tatoc");
 		Thread.sleep(1000);
 		driver.findElement(By.linkText("Basic Course")).sendKeys(Keys.ENTER);
-		//Thread.sleep(1000);
+		Assert.assertEquals(driver.getCurrentUrl(),"http://10.0.1.86/tatoc/basic/grid/gate");
 	}
 	
 	@Test(dependsOnMethods= {"test"})
 	public void gridGate() throws InterruptedException {
-		WebDriver driver=new ChromeDriver();
-		driver.findElement(By.className("greenbox")).click();
-		Thread.sleep(1000);
+		
+		driver.findElement(By.className("greenbox")).click();		
+		Assert.assertEquals( driver.getCurrentUrl(),"http://10.0.1.86/tatoc/basic/frame/dungeon" );
+		Thread.sleep(2000);
+
 		}
 
 
-/**
- * @throws InterruptedException ****************************************************************************************/
 	@Test(dependsOnMethods= {"gridGate"})
 public void frameDungeon() throws InterruptedException {
-	WebDriver driver=new ChromeDriver();
+	
 		Thread.sleep(1000);
 		driver.switchTo().frame("main");
 		String qcolor=driver.findElement(By.id("answer")).getAttribute("class");
@@ -48,6 +51,7 @@ public void frameDungeon() throws InterruptedException {
 			
 		System.out.println(qcolor);
 		while(true){
+			Thread.sleep(1000);
 			driver.findElement(By.linkText("Repaint Box 2")).click();
 			driver.switchTo().frame("child");
 			acolor=driver.findElement(By.id("answer")).getAttribute("class");
@@ -56,15 +60,17 @@ public void frameDungeon() throws InterruptedException {
 			if(qcolor.equals(acolor)) {
 				driver.findElement(By.linkText("Proceed")).click();
 				break;
+				}
 			}
-			
-		}
+			Assert.assertEquals( driver.getCurrentUrl(),"http://10.0.1.86/tatoc/basic/drag" );
+
+		
 }
 		
 //*************************************************************************************************
 	@Test(dependsOnMethods= {"frameDungeon"})
 public void dragAround() throws InterruptedException {
-	WebDriver driver=new ChromeDriver();
+	
 	driver.switchTo().defaultContent();
 		//Element which needs to drag.    		
 		Thread.sleep(1000);
@@ -79,7 +85,8 @@ public void dragAround() throws InterruptedException {
 //Dragged and dropped.		
      act.dragAndDrop(from, to).build().perform();	
      driver.findElement(By.linkText("Proceed")).click();
-     
+		Assert.assertEquals( driver.getCurrentUrl(),"http://10.0.1.86/tatoc/basic/windows" );
+  
 }
 
 
@@ -88,7 +95,6 @@ public void dragAround() throws InterruptedException {
 
 	@Test(dependsOnMethods= {"dragAround"})
 public void popUp() throws InterruptedException {
-	 WebDriver driver=new ChromeDriver();          
      driver.findElement(By.linkText("Launch Popup Window")).click();
      String parentWindow=driver.getWindowHandle();
      
@@ -109,12 +115,12 @@ public void popUp() throws InterruptedException {
      driver.findElement(By.linkText("Proceed")).click();
 
      Thread.sleep(1000);
-     
+		Assert.assertEquals( driver.getCurrentUrl(),"http://10.0.1.86/tatoc/basic/cookie" );
+ 
 }     
      //*********************************************************************************
 	@Test(dependsOnMethods= {"popUp"})
 public void cookie() {
-	WebDriver driver=new ChromeDriver();
 	driver.findElement(By.linkText("Generate Token")).click();
      
      String value=driver.findElement(By.id("token")).getText();
@@ -123,6 +129,7 @@ public void cookie() {
      Cookie ck=new Cookie("Token", value.substring(value.indexOf(":")+2));
      driver.manage().addCookie(ck);
      driver.findElement(By.linkText("Proceed")).click();
+		Assert.assertEquals( driver.getCurrentUrl(),"http://10.0.1.86/tatoc/end" );
 
 	}
 }
